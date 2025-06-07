@@ -20,8 +20,9 @@ function Dashboard() {
 
     const { user } = useContext(AppContext);
 
-    const { data: animeMediaData } = useAnimeData(user);
-    const { data: mangaMediaData } = useMangaData(user);
+    const { data: animeMediaData, isFetching: isFetchingAnime } = useAnimeData(user);
+    const { data: mangaMediaData, isFetching: isFetchingManga } = useMangaData(user);
+    const isFetching = isFetchingAnime || isFetchingManga;
 
     function previousMonth() {
         if (range.month <= 0) {
@@ -41,11 +42,12 @@ function Dashboard() {
 
     return (
         <AniDashContext.Provider value={{range: range}}>
-            <div className="w-full flex gap-4 justify-center items-center">
+            <div className="w-full p-2 flex gap-4 justify-center items-center">
                 <Button className="outlineButton" variant='outline' onClick={previousMonth}>{'<'}</Button>
                 <Label className="text-lg">{months[range.month]} {range.year}</Label>
                 <Button className="outlineButton" variant='outline' onClick={nextMonth}>{'>'}</Button>
             </div>
+            {isFetching && <p>Loading...</p>}
             <div className="flex flex-wrap gap-2 m-4 w-full justify-center items-center">
                 <TitlesCompleted rawData={animeMediaData} mediaType={'Anime'} />
                 <TitlesCompleted rawData={mangaMediaData} mediaType={'Manga'} />

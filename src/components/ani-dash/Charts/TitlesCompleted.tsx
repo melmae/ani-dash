@@ -1,4 +1,4 @@
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import {CartesianGrid, Line, LineChart, XAxis, YAxis} from "recharts"
 import {
     Card,
     CardContent,
@@ -73,7 +73,6 @@ export function TitlesCompleted({rawData, mediaType}: Props) {
                             axisLine={false}
                             tickMargin={8}
                             interval={0}
-                            tickFormatter={(value) => value}
                         />
                         <ChartTooltip
                             cursor={false}
@@ -81,7 +80,7 @@ export function TitlesCompleted({rawData, mediaType}: Props) {
                         />
                         <Line
                             dataKey="count"
-                            type="natural"
+                            type="monotone"
                             stroke="var(--color-count)"
                             strokeWidth={2}
                             dot={false}

@@ -41,7 +41,7 @@ export default function Authentication({setUser}: Props) {
             .catch(err => {
                 console.log(err);
                 const user = {username: '', id: -1, theme: "default"}
-                setUser(user as User);
+                setUser(user);
                 localStorage.setItem('anidash-user', JSON.stringify(user));
             });
     }
@@ -63,7 +63,7 @@ export default function Authentication({setUser}: Props) {
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={(event) => event.key === 'Enter' && validateUsername()}
             />
-            <Button onClick={validateUsername} type="button">Set</Button>
+            <Button className="outlineButton" variant="outline" onClick={validateUsername} type="button">Set</Button>
         </div>
     )
 }

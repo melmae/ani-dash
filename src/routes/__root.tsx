@@ -26,7 +26,7 @@ function RootComponent() {
 
     return (
         <AppContext.Provider value={context}>
-            <div className="sticky top-0 z-50 bg-[#0b1622] border-b w-full px-4 py-2 flex items-center justify-between relative">
+            <div className="sticky top-0 z-50 bg-white dark:bg-[#0b1622] border-b w-full px-4 py-2 flex items-center justify-between">
                 <Select value={currentPath} onValueChange={(value) => navigate({ to: value })}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Select Page" />
@@ -43,7 +43,7 @@ function RootComponent() {
                         ))}
                     </SelectContent>
                 </Select>
-                <h1 className="absolute left-1/2 transform -translate-x-1/2 text-lg font-semibold truncate max-w-[60%] text-center">
+                <h1 className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-extrabold truncate max-w-[60%] text-center" style={{color: user.theme}}>
                     {currentPath.replace('/', '')}
                 </h1>
                 <div className="flex-shrink-0">

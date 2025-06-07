@@ -4,8 +4,8 @@ export interface MediaData {
 }
 
 export interface MediaEntry {
-    status: "current" | "planning" | "completed" | "dropped" | "paused" | "read chapter" | "watched episode",
-    progress: string,
+    status: "current" | "planning" | "completed" | "dropped" | "paused",
+    progress: number,
     completedAt: {
         day: number,
         month: number
@@ -21,6 +21,17 @@ export interface MediaEntry {
         siteUrl: string,
         coverImage: {
             large: string
+        }
+    }
+}
+
+export interface MediaActivity {
+    createdAt: number,
+    progress: string,
+    status: string,
+    media: {
+        title: {
+            english: string
         }
     }
 }

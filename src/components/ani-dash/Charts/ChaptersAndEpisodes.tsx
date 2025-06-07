@@ -15,7 +15,7 @@ import {
 import {useContext} from "react";
 import {AppContext} from "@/AppContext.ts";
 import {AniDashContext} from "@/components/ani-dash/AniDashContext.ts";
-import {MediaEntry} from "@/types/MediaData.ts";
+import {MediaActivity, MediaEntry} from "@/types/MediaData.ts";
 import {useQuery} from "@tanstack/react-query";
 
 interface Props {
@@ -124,7 +124,7 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
         return groupedByDay;
     }
 
-    function getCount(entry:MediaEntry) {
+    function getCount(entry: MediaActivity) {
         if (entry.status === 'completed') {
             return 1;
         } else if (entry.status === 'read chapter' || entry.status === 'watched episode') {
@@ -161,7 +161,6 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
                             axisLine={false}
                             tickMargin={8}
                             interval={0}
-                            tickFormatter={(value) => value}
                         />
                         <ChartTooltip
                             cursor={false}
@@ -169,7 +168,7 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
                         />
                         <Line
                             dataKey="count"
-                            type="natural"
+                            type="monotone"
                             stroke="var(--color-count)"
                             strokeWidth={2}
                             dot={false}
