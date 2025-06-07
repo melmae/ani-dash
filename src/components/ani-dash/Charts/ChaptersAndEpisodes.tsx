@@ -2,29 +2,29 @@ import {CartesianGrid, Line, LineChart, XAxis} from "recharts"
 import {
     Card,
     CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card.tsx"
 import {
     ChartConfig,
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-} from "@/components/ui/chart"
-import {useContext, useEffect, useState} from "react";
-import {AniDashContext} from "@/AniDashContext.ts";
+} from "@/components/ui/chart.tsx"
+import {useContext} from "react";
+import {AppContext} from "@/AppContext.ts";
+import {AniDashContext} from "@/components/ani-dash/AniDashContext.ts";
+import {MediaEntry} from "@/types/MediaData.ts";
+import {useQuery} from "@tanstack/react-query";
 
-export function ChaptersAndEpisodes({mediaType}) {
-    const [rawData, setRawData] = useState([]);
-    const [chartData, setChartData] = useState([]);
+interface Props {
+    mediaType: "Anime" | "Manga"
+}
 
-    let {user} = useContext(AniDashContext);
-
-    useEffect(() => {
-        getNextPage(1);
-    }, []);
+export function ChaptersAndEpisodes({mediaType}: Props) {
+    const {user} = useContext(AppContext);
+    const { range } = useContext(AniDashContext);
 
     const chartConfig = {
         count: {
@@ -33,19 +33,46 @@ export function ChaptersAndEpisodes({mediaType}) {
         },
     } satisfies ChartConfig
 
-    async function getNextPage(pageNumber: number) {
-        const today = new Date();
-        const greaterThan = new Date(today.getFullYear(), today.getMonth(), 1);
+    const { data: rawData } = useQuery({
+        queryKey: ['activityData', mediaType, range],
+        placeholderData: [],
+        queryFn: getAllActivity,
+        staleTime: 1000 * 60 * 60 // cache for an hour
+    })
 
-        let query = `
+    const chartData = monthToDate();
+
+    async function getAllActivity() {
+        const allActivity = [];
+        let hasNextPage = true;
+        let page = 1;
+
+        while (hasNextPage) {
+            const result = await getPage(page);
+
+            allActivity.push(...result.data);
+            hasNextPage = result.hasNextPage;
+            page++;
+
+            await new Promise(resolve => setTimeout(resolve, 300)); // for rate limiting
+        }
+
+        return allActivity;
+    }
+
+    async function getPage(pageNumber: number) {
+        const greaterThan = new Date(range.year, range.month, 1);
+        const lessThan = new Date(range.year, range.month + 1, 1);
+
+        const query = `
             query {
-                Page (page: ${pageNumber}, perPage: 200) {
+                Page (page: ${pageNumber}, perPage: 50) {
                     pageInfo {
                         currentPage,
                         perPage,
                         hasNextPage
                     }
-                    activities(userId: ${user.id}, type: ${mediaType === 'Anime' ? 'ANIME_LIST' : 'MANGA_LIST'}, createdAt_greater: ${greaterThan.getTime() / 1000}) {
+                    activities(userId: ${user.id}, type: ${mediaType === 'Anime' ? 'ANIME_LIST' : 'MANGA_LIST'}, createdAt_greater: ${greaterThan.getTime() / 1000}, createdAt_lesser: ${lessThan.getTime() / 1000}) {
                         ... on ListActivity {
                             createdAt
                             media {
@@ -73,62 +100,42 @@ export function ChaptersAndEpisodes({mediaType}) {
                 })
             };
 
-        await fetch(url, options)
-            .then(res => res.ok ? res.json() : Promise.reject(res))
-            .then((data) => {
-                setRawData([...rawData, ...data.data.Page.activities]);
+        const response = await fetch(url, options);
+        if (!response.ok) throw new Error('Failed to fetch data.');
+        const json = await response.json();
 
-                if (data.data.Page.pageInfo.hasNextPage) {
-                    setTimeout(() => getNextPage(pageNumber++), 1000);
-                } else {
-                    getData([...chartData, ...data.data.Page.activities]);
-                }
-            })
-            .catch(console.log);
+        return {
+            data: json.data.Page.activities,
+            hasNextPage: json.data.Page.pageInfo.hasNextPage,
+        }
     }
 
-    function getData(data) {
-        monthToDate(data);
-    }
-
-    function monthToDate(entries) {
+    function monthToDate() {
         const today = new Date();
 
-        const groupedByDay = [];
-        for (let i = 1; i <= today.getDate(); i++) { // Note: new Date(today.getFullYear(), today.getMonth(), 0).getDate() would get the total number of days in the month
+        const groupedByDay:{day: number, count: number}[] = [];
+        const maxDays = today.getMonth() === range.month ? today.getDate() : new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        for (let i = 1; i <= maxDays; i++) {
             groupedByDay.push({day: i, count: 0});
         }
-        entries.forEach(x => {
+        rawData?.forEach(x => {
             groupedByDay.find(d => d.day === new Date(x.createdAt * 1000).getDate()).count += getCount(x);
         })
-        setChartData(groupedByDay);
+        return groupedByDay;
     }
 
-    // function yearToDate(entries) {
-    //     const today = new Date();
-    //
-    //     const groupedByMonth = [];
-    //     for (let i = 0; i <= today.getMonth(); i++) {
-    //         groupedByMonth.push({month: months[i], count: 0});
-    //     }
-    //     entries.forEach(x => {
-    //         groupedByMonth.find(d => d.month === new Date(x.createdAt * 1000).getMonth()).count += getCount(x);
-    //     })
-    //     setChartData(groupedByMonth);
-    // }
-
-    function getCount(entry) {
+    function getCount(entry:MediaEntry) {
         if (entry.status === 'completed') {
             return 1;
-        } else if (entry.status === 'dropped') {
-            return 0;
-        } else {
+        } else if (entry.status === 'read chapter' || entry.status === 'watched episode') {
             const progressParts = entry.progress.split(' - ');
             if (progressParts.length > 1) {
-                return progressParts[1] - progressParts[0];
+                return parseInt(progressParts[1]) - parseInt(progressParts[0]);
             } else {
                 return 1;
             }
+        } else {
+            return 0
         }
     }
 
@@ -136,9 +143,6 @@ export function ChaptersAndEpisodes({mediaType}) {
         <Card className="w-1/4">
             <CardHeader>
                 <CardTitle>{mediaType === 'Anime' ? `Episodes Watched` : `Chapters Read`}</CardTitle>
-                <CardDescription>
-                    Month To Date
-                </CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig}>

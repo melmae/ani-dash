@@ -1,9 +1,8 @@
 import {createContext} from "react";
 
 export const AniDashContext = createContext({
-    user: {
-        username: '',
-        id: -1
+    range: {
+        month: 0,
+        year: 0
     },
-    setUser: ({}) => {},
 });
