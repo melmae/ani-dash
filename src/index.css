@@ -169,6 +169,12 @@ body {
     border: 0;
   }
 
+  .card-item {
+    background: #0b1622;
+    color: #fff;
+    border: 0;
+  }
+
   .outlineButton {
     background-color: #0b1622;
     color: #fff;

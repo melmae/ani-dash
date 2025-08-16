@@ -1,4 +1,4 @@
-import {CartesianGrid, Line, LineChart, XAxis} from "recharts"
+import {CartesianGrid, Line, LineChart, XAxis, YAxis} from "recharts"
 import {
     Card,
     CardContent,
@@ -15,7 +15,7 @@ import {
 import {useContext} from "react";
 import {AppContext} from "@/AppContext.ts";
 import {AniDashContext} from "@/components/ani-dash/AniDashContext.ts";
-import {MediaActivity, MediaEntry} from "@/types/MediaData.ts";
+import {MediaActivity} from "@/types/MediaData.ts";
 import {useQuery} from "@tanstack/react-query";
 
 interface Props {
@@ -33,7 +33,7 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
         },
     } satisfies ChartConfig
 
-    const { data: rawData } = useQuery({
+    const { data: rawData, isLoading } = useQuery({
         queryKey: ['activityData', mediaType, range],
         placeholderData: [],
         queryFn: getAllActivity,
@@ -119,7 +119,11 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
             groupedByDay.push({day: i, count: 0});
         }
         rawData?.forEach(x => {
-            groupedByDay.find(d => d.day === new Date(x.createdAt * 1000).getDate()).count += getCount(x);
+            const day = new Date(x.createdAt * 1000).getDate();
+            const dayBucket = groupedByDay.find(d => d.day === day);
+            if (dayBucket) {
+                dayBucket.count += getCount(x);
+            }
         })
         return groupedByDay;
     }
@@ -140,27 +144,44 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
     }
 
     return (
-        <Card className="w-1/4">
-            <CardHeader>
+        <Card className="h-full w-full flex flex-col">
+            <CardHeader className="drag-handle cursor-move select-none">
                 <CardTitle>{mediaType === 'Anime' ? `Episodes Watched` : `Chapters Read`}</CardTitle>
             </CardHeader>
-            <CardContent>
-                <ChartContainer config={chartConfig}>
-                    <LineChart
-                        accessibilityLayer
-                        data={chartData}
-                        margin={{
-                            left: 12,
+            <CardContent className="flex-1 min-h-0 w-full">
+                {isLoading ? (
+                    <div className="flex items-center justify-center h-full">
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                            <span className="text-sm text-muted-foreground">Loading...</span>
+                        </div>
+                    </div>
+                ) : (
+                    <ChartContainer config={chartConfig} className="block h-full w-full">
+                        <LineChart
+                            accessibilityLayer
+                            data={chartData}
+                                                    margin={{
+                            left: 0,
                             right: 12,
+                            top: 20,
+                            bottom: 30,
                         }}
-                    >
-                        <CartesianGrid vertical={false}/>
+                        >
+                                                    <CartesianGrid vertical={false}/>
                         <XAxis
                             dataKey={"day"}
                             tickLine={false}
                             axisLine={false}
                             tickMargin={8}
                             interval={0}
+                        />
+                        <YAxis
+                            tickLine={false}
+                            axisLine={false}
+                            tickMargin={0}
+                            width={0}
+                            hide={true}
                         />
                         <ChartTooltip
                             cursor={false}
@@ -173,12 +194,13 @@ export function ChaptersAndEpisodes({mediaType}: Props) {
                             strokeWidth={2}
                             dot={false}
                         />
-                    </LineChart>
-                </ChartContainer>
+                        </LineChart>
+                    </ChartContainer>
+                )}
             </CardContent>
             <CardFooter className="flex-col items-start gap-2 text-sm">
                 <h2 className="text-md">{`Total ${mediaType === 'Anime' ? 'episodes' : 'chapters'}:`}</h2>
-                <h1 className="text-2xl">{chartData.reduce((acc, x) => acc + x.count, 0)}</h1>
+                <h1 className="text-2xl">{isLoading ? "..." : chartData.reduce((acc, x) => acc + x.count, 0)}</h1>
             </CardFooter>
         </Card>
     )

@@ -6,6 +6,7 @@ export interface MediaData {
 export interface MediaEntry {
     status: "current" | "planning" | "completed" | "dropped" | "paused",
     progress: number,
+    score?: number,
     completedAt: {
         day: number,
         month: number
@@ -20,7 +21,7 @@ export interface MediaEntry {
         chapters: number,
         siteUrl: string,
         coverImage: {
-            large: string
+            large: string,
         }
     }
 }

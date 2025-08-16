@@ -18,6 +18,7 @@ async function getData(user: User) {
                     entries {
                         status
                         progress
+                        score
                         completedAt {
                             day,
                             month,
