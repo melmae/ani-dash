@@ -16,7 +16,7 @@ import type {Layouts} from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 
-export const Route = createFileRoute('/AniDash')({
+export const Route = createFileRoute('/ani-dash/AniDash')({
     component: Dashboard
 })
 

@@ -15,7 +15,8 @@ const queryClient = new QueryClient({
 
 const router = createRouter({
     context: () => ({ queryClient: queryClient }),
-    routeTree
+    routeTree,
+    basepath: '/ani-dash',
 });
 declare module '@tanstack/react-router' {
     interface Register {

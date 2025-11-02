@@ -5,7 +5,7 @@ import {createFileRoute} from "@tanstack/react-router";
 import {useMangaData} from "@/hooks/useMangaData.ts";
 import {MediaEntry} from "@/types/MediaData.ts";
 
-export const Route = createFileRoute('/AniComplete')({
+export const Route = createFileRoute('/ani-dash/AniComplete')({
     component: DataList
 })
 

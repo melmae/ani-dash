@@ -20,8 +20,8 @@ function RootComponent() {
     const currentPath = routerState.location.pathname;
 
     const pages = [
-        { name: "AniDash", path: "/AniDash"},
-        { name: "AniComplete", path: "/AniComplete"},
+        { name: "AniDash", path: "/ani-dash/AniDash"},
+        { name: "AniComplete", path: "/ani-dash/AniComplete"},
     ]
 
     return (
@@ -44,7 +44,7 @@ function RootComponent() {
                     </SelectContent>
                 </Select>
                 <h1 className="absolute left-1/2 transform -translate-x-1/2 text-2xl font-extrabold truncate max-w-[60%] text-center" style={{color: user.theme}}>
-                    {currentPath.replace('/', '')}
+                    {currentPath.replace('/ani-dash/', '')}
                 </h1>
                 <div className="flex-shrink-0">
                     <Authentication setUser={setUser} />

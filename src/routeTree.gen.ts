@@ -11,20 +11,27 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AniDashImport } from './routes/AniDash'
-import { Route as AniCompleteImport } from './routes/AniComplete'
+import { Route as IndexImport } from './routes/index'
+import { Route as AniDashAniDashImport } from './routes/ani-dash/AniDash'
+import { Route as AniDashAniCompleteImport } from './routes/ani-dash/AniComplete'
 
 // Create/Update Routes
 
-const AniDashRoute = AniDashImport.update({
-  id: '/AniDash',
-  path: '/AniDash',
+const IndexRoute = IndexImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRoute,
 } as any)
 
-const AniCompleteRoute = AniCompleteImport.update({
-  id: '/AniComplete',
-  path: '/AniComplete',
+const AniDashAniDashRoute = AniDashAniDashImport.update({
+  id: '/ani-dash/AniDash',
+  path: '/ani-dash/AniDash',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AniDashAniCompleteRoute = AniDashAniCompleteImport.update({
+  id: '/ani-dash/AniComplete',
+  path: '/ani-dash/AniComplete',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -32,18 +39,25 @@ const AniCompleteRoute = AniCompleteImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/AniComplete': {
-      id: '/AniComplete'
-      path: '/AniComplete'
-      fullPath: '/AniComplete'
-      preLoaderRoute: typeof AniCompleteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/AniDash': {
-      id: '/AniDash'
-      path: '/AniDash'
-      fullPath: '/AniDash'
-      preLoaderRoute: typeof AniDashImport
+    '/ani-dash/AniComplete': {
+      id: '/ani-dash/AniComplete'
+      path: '/ani-dash/AniComplete'
+      fullPath: '/ani-dash/AniComplete'
+      preLoaderRoute: typeof AniDashAniCompleteImport
+      parentRoute: typeof rootRoute
+    }
+    '/ani-dash/AniDash': {
+      id: '/ani-dash/AniDash'
+      path: '/ani-dash/AniDash'
+      fullPath: '/ani-dash/AniDash'
+      preLoaderRoute: typeof AniDashAniDashImport
       parentRoute: typeof rootRoute
     }
   }
@@ -52,38 +66,43 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/AniComplete': typeof AniCompleteRoute
-  '/AniDash': typeof AniDashRoute
+  '/': typeof IndexRoute
+  '/ani-dash/AniComplete': typeof AniDashAniCompleteRoute
+  '/ani-dash/AniDash': typeof AniDashAniDashRoute
 }
 
 export interface FileRoutesByTo {
-  '/AniComplete': typeof AniCompleteRoute
-  '/AniDash': typeof AniDashRoute
+  '/': typeof IndexRoute
+  '/ani-dash/AniComplete': typeof AniDashAniCompleteRoute
+  '/ani-dash/AniDash': typeof AniDashAniDashRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
-  '/AniComplete': typeof AniCompleteRoute
-  '/AniDash': typeof AniDashRoute
+  '/': typeof IndexRoute
+  '/ani-dash/AniComplete': typeof AniDashAniCompleteRoute
+  '/ani-dash/AniDash': typeof AniDashAniDashRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/AniComplete' | '/AniDash'
+  fullPaths: '/' | '/ani-dash/AniComplete' | '/ani-dash/AniDash'
   fileRoutesByTo: FileRoutesByTo
-  to: '/AniComplete' | '/AniDash'
-  id: '__root__' | '/AniComplete' | '/AniDash'
+  to: '/' | '/ani-dash/AniComplete' | '/ani-dash/AniDash'
+  id: '__root__' | '/' | '/ani-dash/AniComplete' | '/ani-dash/AniDash'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  AniCompleteRoute: typeof AniCompleteRoute
-  AniDashRoute: typeof AniDashRoute
+  IndexRoute: typeof IndexRoute
+  AniDashAniCompleteRoute: typeof AniDashAniCompleteRoute
+  AniDashAniDashRoute: typeof AniDashAniDashRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  AniCompleteRoute: AniCompleteRoute,
-  AniDashRoute: AniDashRoute,
+  IndexRoute: IndexRoute,
+  AniDashAniCompleteRoute: AniDashAniCompleteRoute,
+  AniDashAniDashRoute: AniDashAniDashRoute,
 }
 
 export const routeTree = rootRoute
@@ -96,15 +115,19 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/AniComplete",
-        "/AniDash"
+        "/",
+        "/ani-dash/AniComplete",
+        "/ani-dash/AniDash"
       ]
     },
-    "/AniComplete": {
-      "filePath": "AniComplete.tsx"
+    "/": {
+      "filePath": "index.tsx"
     },
-    "/AniDash": {
-      "filePath": "AniDash.tsx"
+    "/ani-dash/AniComplete": {
+      "filePath": "ani-dash/AniComplete.tsx"
+    },
+    "/ani-dash/AniDash": {
+      "filePath": "ani-dash/AniDash.tsx"
     }
   }
 }
