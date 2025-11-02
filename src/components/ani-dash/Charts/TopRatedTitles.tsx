@@ -6,7 +6,6 @@ import {
     CardTitle,
 } from "@/components/ui/card.tsx"
 import {useContext, useState} from "react";
-import {AppContext} from "@/AppContext.ts";
 import {AniDashContext} from "@/components/ani-dash/AniDashContext.ts";
 import {MediaData} from "@/types/MediaData.ts";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
